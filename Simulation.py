@@ -289,53 +289,53 @@ def PowerControl(_uavs, _users):
         _users[_uavs[idxUAV[i]].deviceIdx[idxUSER[i]]].power = qp.value[i]
     return
 
-def Deployment(_uavs, _users):
-    g0 = 40
-    ik = 0.005
+# def Deployment(_uavs, _users):
+#     g0 = 40
+#     ik = 0.005
 
-    idxUAV = []
-    idxUSER = []
-    idxPower = []
-    idxBeta = []
-    idxBand = []
-    for i in range(UAVNUM):
-        for j in range(len(_uavs[i].deviceIdx)):
-            idxUAV.append(i)
-            idxUSER.append(j)
-            idxBeta.append(_users[_uavs[i].deviceIdx[j]].beta)
-            idxPower.append(_users[_uavs[i].deviceIdx[j]].power)
-            idxBand.append(_users[_uavs[i].deviceIdx[j]].subbandIndex)
+#     idxUAV = []
+#     idxUSER = []
+#     idxPower = []
+#     idxBeta = []
+#     idxBand = []
+#     for i in range(UAVNUM):
+#         for j in range(len(_uavs[i].deviceIdx)):
+#             idxUAV.append(i)
+#             idxUSER.append(j)
+#             idxBeta.append(_users[_uavs[i].deviceIdx[j]].beta)
+#             idxPower.append(_users[_uavs[i].deviceIdx[j]].power)
+#             idxBand.append(_users[_uavs[i].deviceIdx[j]].subbandIndex)
 
-    Pos_max = 250 * np.ones(shape=(2, ))
-    Pos_min = -250 * np.ones(shape=(2, ))
+#     Pos_max = 250 * np.ones(shape=(2, ))
+#     Pos_min = -250 * np.ones(shape=(2, ))
 
-    iUav = 0
-    for _uav in _uavs:
-        qPos = cvx.Variable(shape=(2,))
+#     iUav = 0
+#     for _uav in _uavs:
+#         qPos = cvx.Variable(shape=(2,))
 
-        qdis = []
-        cdis = []
-        for j in range(len(_uav.deviceIdx)):
-            tmpUAV = [_uav.pos[0], _uav.pos[1]]
-            tmpUSER = [_users[_uav.deviceIdx[idxUSER[j]]].pos[0], _users[_uav.deviceIdx[idxUSER[j]]].pos[1]]
-            qdis.append(cvx.sum((cvx.hstack(qPos) - cvx.hstack(tmpUSER))**2) + 2500)
-            cdis.append((tmpUAV[0]-tmpUSER[0])**2 + (tmpUAV[1]-tmpUSER[1])**2 + 2500)
+#         qdis = []
+#         cdis = []
+#         for j in range(len(_uav.deviceIdx)):
+#             tmpUAV = [_uav.pos[0], _uav.pos[1]]
+#             tmpUSER = [_users[_uav.deviceIdx[idxUSER[j]]].pos[0], _users[_uav.deviceIdx[idxUSER[j]]].pos[1]]
+#             qdis.append(cvx.sum((cvx.hstack(qPos) - cvx.hstack(tmpUSER))**2) + 2500)
+#             cdis.append((tmpUAV[0]-tmpUSER[0])**2 + (tmpUAV[1]-tmpUSER[1])**2 + 2500)
 
-        qPG = []
-        for i in range(len(_uav.deviceIdx)):
-            qPG.append((qdis[i] * cvx.exp(ik * cvx.sqrt(cdis[i])))/ (idxPower[i] * g0))
+#         qPG = []
+#         for i in range(len(_uav.deviceIdx)):
+#             qPG.append((qdis[i] * cvx.exp(ik * cvx.sqrt(cdis[i])))/ (idxPower[i] * g0))
 
-        constraints = [
-            qPos <= Pos_max,
-            qPos >= Pos_min,
-        ]
-        problem = cvx.Problem(cvx.Minimize(cvx.sum(qPG)), constraints)
-        problem.solve(solver= cvx.MOSEK, gp=False) 
+#         constraints = [
+#             qPos <= Pos_max,
+#             qPos >= Pos_min,
+#         ]
+#         problem = cvx.Problem(cvx.Minimize(cvx.sum(qPG)), constraints)
+#         problem.solve(solver= cvx.MOSEK, gp=False) 
 
-        _uav.pos[0] = qPos.value[0]
-        _uav.pos[1] = qPos.value[1] 
-        iUav += 1
-    return
+#         _uav.pos[0] = qPos.value[0]
+#         _uav.pos[1] = qPos.value[1] 
+#         iUav += 1
+#     return
 
 def DeploymentCentered(_uavs, _users):
     for i in range(UAVNUM):
@@ -421,4 +421,4 @@ if __name__ == '__main__':
             TaskOffloading(uavs, users)
             SubbandAssignment(uavs, users)
             PowerControl(uavs, users)
-            Deployment(uavs, users)
+#            Deployment(uavs, users)
