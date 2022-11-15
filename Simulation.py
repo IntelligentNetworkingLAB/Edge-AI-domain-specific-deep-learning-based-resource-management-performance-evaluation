@@ -399,15 +399,15 @@ def Clustering(_uavs, _users):
         #print(f'({row}, {column%clusterNum}) -> {value}')    
     return
 
-# def InitialSetting(_uavs, _users):
-#     for uav in _uavs:
-#         id = 0
-#         for ue in uav.deviceIdx:
-#             _users[ue].beta = MAXA/2
-#             _users[ue].subbandIndex = id
-#             _users[ue].power = MAXPOWER/2
-#             id += 1
-#     return
+def InitialSetting(_uavs, _users):
+    for uav in _uavs:
+        id = 0
+        for ue in uav.deviceIdx:
+            _users[ue].beta = MAXA/2
+            _users[ue].subbandIndex = id
+            _users[ue].power = MAXPOWER/2
+            id += 1
+    return
 
 if __name__ == '__main__':
     for _ in range(1):
