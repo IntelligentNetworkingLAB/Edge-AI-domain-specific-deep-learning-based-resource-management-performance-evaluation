@@ -415,10 +415,10 @@ if __name__ == '__main__':
         users = [cDevice([rand.randrange(-250, 250), rand.randrange(-250, 250), 0]) for _ in range(USERNUM)]
         Clustering(uavs, users)
         InitialSetting(uavs, users)
-        DeploymentCentered(uavs, users)
+#        DeploymentCentered(uavs, users)
         
         for _ in range(2):
             TaskOffloading(uavs, users)
             SubbandAssignment(uavs, users)
             PowerControl(uavs, users)
-            Deployment(uavs, users)
+#            Deployment(uavs, users)
