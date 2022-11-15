@@ -12,10 +12,10 @@ import pandas as pd
 from munkres import Munkres
 
 MAXBAND = 20
-MAXPOWER = 2e+2
+MAXPOWER = 3e+2
 MAXA = 1.0
-UAVNUM = 4
-USERNUM = 60
+UAVNUM = 8
+USERNUM = 120
 
 def Euclidean(p, q):
     return math.sqrt(math.pow(p[0]-q[0],2) + math.pow(p[1]-q[1],2) + math.pow(p[2]-q[2],2))
