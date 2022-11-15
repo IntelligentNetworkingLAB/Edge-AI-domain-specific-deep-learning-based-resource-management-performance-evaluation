@@ -210,84 +210,84 @@ def SubbandAssignment(_uavs, _users):
         _iUav += 1
     return
 
-def PowerControl(_uavs, _users):
-    varphi = 1e-2
-    omega = 5e+2
-    sigma = 174
+# def PowerControl(_uavs, _users):
+#     varphi = 1e-2
+#     omega = 5e+2
+#     sigma = 174
 
-    totalNum = len(_users)
+#     totalNum = len(_users)
 
-    idxUAV = []
-    idxUSER = []
-    idxBand = []
-    idxBeta = []
-    idxPower = []
-    idxGain = []
-    for i in range(UAVNUM):
-        for j in range(len(_uavs[i].deviceIdx)):
-            idxUAV.append(i)
-            idxUSER.append(j)
-            idxBand.append(_users[_uavs[i].deviceIdx[j]].subbandIndex)
-            idxBeta.append(_users[_uavs[i].deviceIdx[j]].beta)
-            idxPower.append(_users[_uavs[i].deviceIdx[j]].power)
+#     idxUAV = []
+#     idxUSER = []
+#     idxBand = []
+#     idxBeta = []
+#     idxPower = []
+#     idxGain = []
+#     for i in range(UAVNUM):
+#         for j in range(len(_uavs[i].deviceIdx)):
+#             idxUAV.append(i)
+#             idxUSER.append(j)
+#             idxBand.append(_users[_uavs[i].deviceIdx[j]].subbandIndex)
+#             idxBeta.append(_users[_uavs[i].deviceIdx[j]].beta)
+#             idxPower.append(_users[_uavs[i].deviceIdx[j]].power)
             
-            dis = Euclidean(_uavs[i].pos, _users[_uavs[i].deviceIdx[j]].pos)
-            g0 = 40
-            ik = 0.005
-            g = g0 * dis**(-2) * math.exp(ik * dis)
-            idxGain.append(g)
+#             dis = Euclidean(_uavs[i].pos, _users[_uavs[i].deviceIdx[j]].pos)
+#             g0 = 40
+#             ik = 0.005
+#             g = g0 * dis**(-2) * math.exp(ik * dis)
+#             idxGain.append(g)
 
-    qGG = []
-    qTMP = []
-    deltaTMP = []
-    for i in range(totalNum):
-        qgg = 0
-        qtmp = 0
-        for j in range(totalNum):
-            if idxUAV[i] == idxUAV[j]: continue
-            if idxBand[i] == idxBand[j]:
-                dis = Euclidean(_uavs[idxUAV[i]].pos, _users[_uavs[idxUAV[j]].deviceIdx[idxUSER[j]]].pos)
-                g0 = 40
-                ik = 0.005
-                g = g0 * dis**(-2) * math.exp(ik * dis)
-                qgg += g
-                qtmp += idxPower[j]*g
-        qGG.append(qgg)
-        qTMP.append(qtmp)
-        deltaTMP.append(qGG[i] / (math.log(2) * (qTMP[i] + sigma)))
+#     qGG = []
+#     qTMP = []
+#     deltaTMP = []
+#     for i in range(totalNum):
+#         qgg = 0
+#         qtmp = 0
+#         for j in range(totalNum):
+#             if idxUAV[i] == idxUAV[j]: continue
+#             if idxBand[i] == idxBand[j]:
+#                 dis = Euclidean(_uavs[idxUAV[i]].pos, _users[_uavs[idxUAV[j]].deviceIdx[idxUSER[j]]].pos)
+#                 g0 = 40
+#                 ik = 0.005
+#                 g = g0 * dis**(-2) * math.exp(ik * dis)
+#                 qgg += g
+#                 qtmp += idxPower[j]*g
+#         qGG.append(qgg)
+#         qTMP.append(qtmp)
+#         deltaTMP.append(qGG[i] / (math.log(2) * (qTMP[i] + sigma)))
 
-    #########################################################
+#     #########################################################
 
-    qp = cvx.Variable(shape=(totalNum,), pos=True)
-    P_max = MAXPOWER * np.ones(totalNum)
-    P_min = 5 * np.ones(totalNum)
-    ome_var = (varphi*omega) * np.ones(totalNum)
-    qSigma = sigma * np.ones(totalNum)
+#     qp = cvx.Variable(shape=(totalNum,), pos=True)
+#     P_max = MAXPOWER * np.ones(totalNum)
+#     P_min = 5 * np.ones(totalNum)
+#     ome_var = (varphi*omega) * np.ones(totalNum)
+#     qSigma = sigma * np.ones(totalNum)
 
-    qPG = []
-    for i in range(totalNum):
-        qPG.append(cvx.sum(cvx.hstack(idxGain[j]*qp[j] for j in range(totalNum) if idxBand[i] == idxBand[j])))
-        #qPG.append(cvx.sum(cvx.hstack(idxGain[j]*idxPower[j] for j in range(totalNum) if idxBand[i] == idxBand[j])))
-    qR = cvx.log(cvx.hstack(qPG) + qSigma) - (cvx.log(qTMP + qSigma) + cvx.multiply(deltaTMP, (qp - cvx.hstack(idxPower))))
-    #qR = cvx.log(cvx.hstack(qPG) + qSigma) - cvx.log(qTMP + qSigma)
-    qR = omega * qR
+#     qPG = []
+#     for i in range(totalNum):
+#         qPG.append(cvx.sum(cvx.hstack(idxGain[j]*qp[j] for j in range(totalNum) if idxBand[i] == idxBand[j])))
+#         #qPG.append(cvx.sum(cvx.hstack(idxGain[j]*idxPower[j] for j in range(totalNum) if idxBand[i] == idxBand[j])))
+#     qR = cvx.log(cvx.hstack(qPG) + qSigma) - (cvx.log(qTMP + qSigma) + cvx.multiply(deltaTMP, (qp - cvx.hstack(idxPower))))
+#     #qR = cvx.log(cvx.hstack(qPG) + qSigma) - cvx.log(qTMP + qSigma)
+#     qR = omega * qR
 
-    qE =  cvx.multiply(cvx.multiply(cvx.hstack(idxPower), cvx.hstack(idxBeta)), cvx.hstack(qR**(-1)))
-    #qE =  cvx.multiply(cvx.multiply(qp, cvx.hstack(idxBeta)), cvx.hstack(qR**(-1)))
+#     qE =  cvx.multiply(cvx.multiply(cvx.hstack(idxPower), cvx.hstack(idxBeta)), cvx.hstack(qR**(-1)))
+#     #qE =  cvx.multiply(cvx.multiply(qp, cvx.hstack(idxBeta)), cvx.hstack(qR**(-1)))
 
-    constraints = [
-        cvx.hstack(qR) >= cvx.multiply(idxBeta, ome_var**(-1)) ,
-        qp <= P_max,
-        qp >= P_min,
-        cvx.sum(qp) <= 60 * MAXPOWER / 2
-    ]
+#     constraints = [
+#         cvx.hstack(qR) >= cvx.multiply(idxBeta, ome_var**(-1)) ,
+#         qp <= P_max,
+#         qp >= P_min,
+#         cvx.sum(qp) <= 60 * MAXPOWER / 2
+#     ]
     
-    problem = cvx.Problem(cvx.Minimize(cvx.sum(qE)), constraints)
-    problem.solve(solver= cvx.MOSEK, gp=False)
+#     problem = cvx.Problem(cvx.Minimize(cvx.sum(qE)), constraints)
+#     problem.solve(solver= cvx.MOSEK, gp=False)
     
-    for i in range(len(qp.value)):
-        _users[_uavs[idxUAV[i]].deviceIdx[idxUSER[i]]].power = qp.value[i]
-    return
+#     for i in range(len(qp.value)):
+#         _users[_uavs[idxUAV[i]].deviceIdx[idxUSER[i]]].power = qp.value[i]
+#     return
 
 def Deployment(_uavs, _users):
     g0 = 40
@@ -420,5 +420,5 @@ if __name__ == '__main__':
         for _ in range(2):
             TaskOffloading(uavs, users)
             SubbandAssignment(uavs, users)
-            PowerControl(uavs, users)
+#            PowerControl(uavs, users)
             Deployment(uavs, users)
