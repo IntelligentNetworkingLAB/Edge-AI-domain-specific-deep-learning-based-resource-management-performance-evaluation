@@ -348,56 +348,56 @@ def DeploymentCentered(_uavs, _users):
         _uavs[i].pos[0] = centered[0]
         _uavs[i].pos[1] = centered[1]
 
-def Clustering(_uavs, _users):
-    # Clustering based Balanced-K-means
-    clusterNum = len(_uavs)
-    dataNum = len(_users)
+# def Clustering(_uavs, _users):
+#     # Clustering based Balanced-K-means
+#     clusterNum = len(_uavs)
+#     dataNum = len(_users)
 
-    clusterSize = int(dataNum/clusterNum)
+#     clusterSize = int(dataNum/clusterNum)
 
-    datas = []
-    # create data
-    for i in range(dataNum):
-        datas.append([_users[i].pos[0], _users[i].pos[1]])
-    # initialize centroid
-    centroids = []
-    for _ in range(clusterSize):
-        for uav in _uavs:
-            centroids.append(uav.pos)
-    # Main Loop for Balanced K-Means
-    max_iter = 100
-    for _ in range(max_iter):
-        # Calculate edge weights
-        G = []
-        for i in range(dataNum):
-            node = []
-            for j in range(dataNum):
-                node.append(Euclidean([datas[i][0], datas[i][1], 0], [centroids[j][0], centroids[j][1], 0]))
-            G.append(node)
-        # Solve Assignment Problem
-        m = Munkres()
-        indexes = m.compute(G)
-        # Calculate new centroid locations
-        newCentroids = [[0.0,0.0] for _ in range(clusterNum)]
-        for row, column in indexes:
-            newCentroids[column%clusterNum][0] += datas[row][0]
-            newCentroids[column%clusterNum][1] += datas[row][1]
-        for i in range(clusterNum):
-            newCentroids[i][0] = newCentroids[i][0]/clusterSize
-            newCentroids[i][1] = newCentroids[i][1]/clusterSize
-        # if not change centroid
-        if centroids[0]==newCentroids[0] and centroids[1]==newCentroids[1] and centroids[2]==newCentroids[2]:
-            break
-        # else continue
-        for i in range(clusterSize):
-            for j in range(clusterNum):
-                centroids[clusterNum*i + j] = newCentroids[j]
+#     datas = []
+#     # create data
+#     for i in range(dataNum):
+#         datas.append([_users[i].pos[0], _users[i].pos[1]])
+#     # initialize centroid
+#     centroids = []
+#     for _ in range(clusterSize):
+#         for uav in _uavs:
+#             centroids.append(uav.pos)
+#     # Main Loop for Balanced K-Means
+#     max_iter = 100
+#     for _ in range(max_iter):
+#         # Calculate edge weights
+#         G = []
+#         for i in range(dataNum):
+#             node = []
+#             for j in range(dataNum):
+#                 node.append(Euclidean([datas[i][0], datas[i][1], 0], [centroids[j][0], centroids[j][1], 0]))
+#             G.append(node)
+#         # Solve Assignment Problem
+#         m = Munkres()
+#         indexes = m.compute(G)
+#         # Calculate new centroid locations
+#         newCentroids = [[0.0,0.0] for _ in range(clusterNum)]
+#         for row, column in indexes:
+#             newCentroids[column%clusterNum][0] += datas[row][0]
+#             newCentroids[column%clusterNum][1] += datas[row][1]
+#         for i in range(clusterNum):
+#             newCentroids[i][0] = newCentroids[i][0]/clusterSize
+#             newCentroids[i][1] = newCentroids[i][1]/clusterSize
+#         # if not change centroid
+#         if centroids[0]==newCentroids[0] and centroids[1]==newCentroids[1] and centroids[2]==newCentroids[2]:
+#             break
+#         # else continue
+#         for i in range(clusterSize):
+#             for j in range(clusterNum):
+#                 centroids[clusterNum*i + j] = newCentroids[j]
     
-    for row, column in indexes:
-        value = G[row][column]
-        _uavs[column%clusterNum].deviceIdx.append(row)
-        #print(f'({row}, {column%clusterNum}) -> {value}')    
-    return
+#     for row, column in indexes:
+#         value = G[row][column]
+#         _uavs[column%clusterNum].deviceIdx.append(row)
+#         #print(f'({row}, {column%clusterNum}) -> {value}')    
+#     return
 
 def InitialSetting(_uavs, _users):
     for uav in _uavs:
@@ -413,7 +413,7 @@ if __name__ == '__main__':
     for _ in range(1):
         uavs = [cUAV([-125, 125, 50]), cUAV([125, 125, 50]), cUAV([-125, -125, 50]), cUAV([125, -125, 50])]
         users = [cDevice([rand.randrange(-250, 250), rand.randrange(-250, 250), 0]) for _ in range(USERNUM)]
-        Clustering(uavs, users)
+#        Clustering(uavs, users)
         InitialSetting(uavs, users)
         DeploymentCentered(uavs, users)
         
