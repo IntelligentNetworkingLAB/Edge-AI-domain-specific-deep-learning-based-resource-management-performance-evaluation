@@ -1,1 +1,1 @@
-# THz-Assisted-Integrated-Space-Air-Ground-Netoworks
+# Edge-AI domain-specific Deep Learning-based Resource Management Performance Evaluation
